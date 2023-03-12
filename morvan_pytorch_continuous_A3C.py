@@ -21,7 +21,7 @@ GAMMA = 0.9
 MAX_EP = 3000
 MAX_EP_STEP = 200
 
-env = gym.make('Pendulum-v1')
+env = gym.make('Pendulum-v0')
 N_S = env.observation_space.shape[0]
 N_A = env.action_space.shape[0]
 
@@ -75,7 +75,7 @@ class Worker(mp.Process):
         self.g_ep, self.g_ep_r, self.res_queue = global_ep, global_ep_r, res_queue
         self.gnet, self.opt = gnet, opt
         self.lnet = Net(N_S, N_A)           # local network
-        self.env = gym.make('Pendulum-v1').unwrapped
+        self.env = gym.make('Pendulum-v0').unwrapped
 
     def run(self):
         total_step = 1
@@ -87,7 +87,7 @@ class Worker(mp.Process):
                 if self.name == 'w0':
                     self.env.render()
                 a = self.lnet.choose_action(v_wrap(s[None, :]))
-                s_, r, done, _ = self.env.step(a.clip(-2, 2))
+                s_, r, done, _ = self.env.step(a.clip(-2, 2))   #check this
                 if t == MAX_EP_STEP - 1:
                     done = True
                 ep_r += r
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     global_ep, global_ep_r, res_queue = mp.Value('i', 0), mp.Value('d', 0.), mp.Queue()
 
     # parallel training
-    workers = [Worker(gnet, opt, global_ep, global_ep_r, res_queue, i) for i in range(mp.cpu_count())]
+    workers = [Worker(gnet, opt, global_ep, global_ep_r, res_queue, i) for i in range(20)] #range(mp.cpu_count())
     [w.start() for w in workers]
     res = []                    # record episode reward to plot
 

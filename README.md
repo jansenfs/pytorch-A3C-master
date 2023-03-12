@@ -35,7 +35,7 @@ BTW, if you are interested to learn Pytorch, [there](https://github.com/MorvanZh
 * [shared_adam.py](/shared_adam.py): optimizer that shares its parameters in parallel
 * [utils.py](/utils.py): useful function that can be used more than once
 * [discrete_A3C.py](/discrete_A3C.py): CartPole, neural net and training for discrete action space
-* [continuous_A3C.py](/continuous_A3C.py): Pendulum, neural net and training for continuous action space
+* [continuous_A3C.py](/morvan_pytorch_continuous_A3C.py): Pendulum, neural net and training for continuous action space
 
 CartPole result
 ![cartpole](/results/cartpole.png)
