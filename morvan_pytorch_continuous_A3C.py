@@ -18,8 +18,10 @@ os.environ["OMP_NUM_THREADS"] = "1"
 
 UPDATE_GLOBAL_ITER = 5
 GAMMA = 0.9
-MAX_EP = 3000
+MAX_EP = 10000
 MAX_EP_STEP = 200
+lr_value = 1e-4
+ENTROPY_BETA = 0.03
 
 env = gym.make('Pendulum-v0')
 N_S = env.observation_space.shape[0]
@@ -62,7 +64,7 @@ class Net(nn.Module):
         m = self.distribution(mu, sigma)
         log_prob = m.log_prob(a)
         entropy = 0.5 + 0.5 * math.log(2 * math.pi) + torch.log(m.scale)  # exploration
-        exp_v = log_prob * td.detach() + 0.005 * entropy
+        exp_v = log_prob * td.detach() + ENTROPY_BETA * entropy
         a_loss = -exp_v
         total_loss = (a_loss + c_loss).mean()
         return total_loss
@@ -112,7 +114,7 @@ class Worker(mp.Process):
 if __name__ == "__main__":
     gnet = Net(N_S, N_A)        # global network
     gnet.share_memory()         # share the global parameters in multiprocessing
-    opt = SharedAdam(gnet.parameters(), lr=1e-4, betas=(0.95, 0.999))  # global optimizer
+    opt = SharedAdam(gnet.parameters(), lr=lr_value, betas=(0.95, 0.999))  # global optimizer
     global_ep, global_ep_r, res_queue = mp.Value('i', 0), mp.Value('d', 0.), mp.Queue()
 
     # parallel training
